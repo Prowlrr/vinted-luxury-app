@@ -1,0 +1,28 @@
+name: Vinted Scraper Engine
+on:
+  schedule:
+    - cron: '*/10 * * * *' # Läuft alle 10 Min
+  workflow_dispatch:      # Ermöglicht manuellen Start auf GitHub
+
+permissions:
+  contents: write         # Erlaubt dem Bot, die index.html zu ändern
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - name: Install Tools
+        run: pip install requests
+      - name: Scrape and Update
+        run: python scraper.py # Hier rufen wir dein Skript auf
+      - name: Save Changes
+        run: |
+          git config --global user.name "Vinted-Bot"
+          git config --global user.email "bot@github.com"
+          git add index.html
+          git commit -m "Bot: Neue Gucci/Nike Drops hinzugefügt" || exit 0
+          git push
